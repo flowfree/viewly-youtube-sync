@@ -10,18 +10,23 @@ import httplib2
 from apiclient import discovery
 from oauth2client import client
 from flask import (
-    Flask, request, session, url_for, redirect, jsonify,
+    Flask, request, session, url_for, redirect, jsonify, render_template
 )
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CLIENT_SECRETS_JSON = os.path.join(BASE_DIR, 'client_secrets.json')
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
 
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+
+@app.route('/youtube_auth')
+def youtube_auth():
     if 'credentials' not in session:
         return redirect(url_for('oauth2callback'))
     credentials = client.OAuth2Credentials.from_json(session['credentials'])
@@ -45,7 +50,7 @@ def index():
 @app.route('/oauth2callback')
 def oauth2callback():
     flow = client.flow_from_clientsecrets(
-        'client_secrets.json',
+        CLIENT_SECRETS_JSON,
         scope='https://www.googleapis.com/auth/youtube.readonly',
         redirect_uri=url_for('oauth2callback', _external=True),
     )
@@ -56,7 +61,7 @@ def oauth2callback():
         auth_code = request.args.get('code')
         credentials = flow.step2_exchange(auth_code)
         session['credentials'] = credentials.to_json()
-        return redirect(url_for('index'))
+        return redirect(url_for('youtube_auth'))
 
 
 @app.route('/revoke')
