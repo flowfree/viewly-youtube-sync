@@ -92,5 +92,5 @@ if __name__ == "__main__":
         print('Please obtain the Youtube API client ID and secret.')
         sys.exit()
     app.secret_key = str(uuid.uuid4())
-    app.debug = True
-    app.run(port=3000)
+    app.debug = not bool(os.getenv('PRODUCTION'))
+    app.run(host=os.getenv('FLASK_HOST', '127.0.0.1'), port=5000)
