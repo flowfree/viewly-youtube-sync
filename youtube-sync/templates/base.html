@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <title>{% block title %}Youtube Sync{% endblock %}</title>
+
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/semantic.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <div class="ui fixed inverted menu">
+    <div class="ui container">
+      <a href="/" class="header item">
+        <img class="logo" src="{{ url_for('static', filename='img/favicon.ico') }}" style="width: 24px;">
+        &nbsp; YouTube Sync App
+      </a>
+      <a href="/" class="item">Home</a>
+      <div class="ui simple dropdown item">
+        Dropdown <i class="dropdown icon"></i>
+        <div class="menu">
+          <a class="item" href="/">Link Item</a>
+          <a class="item" href="/">Link Item</a>
+          <div class="divider"></div>
+          <div class="header">Header Item</div>
+          <div class="item">
+            <i class="dropdown icon"></i>
+            Sub Menu
+            <div class="menu">
+              <a class="item" href="/">Link Item</a>
+              <a class="item" href="/">Link Item</a>
+            </div>
+          </div>
+          <a class="item" href="/">Link Item</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ui main container">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/semantic.min.js') }}"></script>
+  {% block scripts %}
+  {% endblock %}
+  <script>
+    semantic = {button: {}};
+    semantic.button.ready = function() {
+      var $buttons = $('.ui.buttons .button');
+      var $toggle = $('.ui.toggle.button');
+      var $button = $('.ui.button').not($buttons).not($toggle);
+
+      var handler = {
+        activate: function() {
+          $(this).addClass('active').siblings().removeClass('active');
+        }
+      };
+
+      $buttons.on('click', handler.activate);
+      $toggle.state({
+        text: {
+          active: '<i class="icon checkmark"></i> Selected',
+          inactive: 'Select'
+        }
+      });
+    }
+
+    $(document).ready(semantic.button.ready);
+  </script>
+</body>
+</html>

@@ -7,6 +7,7 @@ import os
 import sys
 
 import httplib2
+import dateutil.parser
 from apiclient import discovery
 from oauth2client import client
 from flask import (
@@ -25,8 +26,8 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/youtube_auth')
-def youtube_auth():
+@app.route('/video_list')
+def video_list():
     if 'credentials' not in session:
         return redirect(url_for('oauth2callback'))
     credentials = client.OAuth2Credentials.from_json(session['credentials'])
@@ -39,12 +40,18 @@ def youtube_auth():
         playlist_id = channel['items'][0]['contentDetails']['relatedPlaylists']['uploads']
     except KeyError:
         return 'No uploaded videos.'
-    videos = youtube.playlistItems().list(
+    data = youtube.playlistItems().list(
         playlistId=playlist_id, 
         maxResults=25, 
         part='snippet,contentDetails',
     ).execute()
-    return jsonify(videos)
+
+    try:
+        videos = data['items']
+    except Exception as e:
+        print(e)
+        videos = []
+    return render_template('video_list.html', videos=videos)
 
 
 @app.route('/oauth2callback')
@@ -61,7 +68,7 @@ def oauth2callback():
         auth_code = request.args.get('code')
         credentials = flow.step2_exchange(auth_code)
         session['credentials'] = credentials.to_json()
-        return redirect(url_for('youtube_auth'))
+        return redirect(url_for('video_list'))
 
 
 @app.route('/revoke')
@@ -72,6 +79,12 @@ def revoke():
         return 'access revoked.'
     else:
         return 'no credentials in session'
+
+
+@app.template_filter('datetime')
+def datetime(s):
+    dt = dateutil.parser.parse(s)
+    return dt.strftime('%B %d, %Y')
 
 
 if __name__ == "__main__":

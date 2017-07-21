@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Video List{% endblock %}
+
+{% block content %}
+  <div class="ui two column grid container">
+    <div class="column">
+      {% if videos %}
+        <p>You have {{ videos|length }} videos.</p>
+      {% else %}
+        <p>No video found.</p>
+      {% endif %}
+    </div>
+    <div class="column">
+      <button id="sync-selected-videos" class="tiny ui right floated primary button">Sync selected videos</button>
+      <button id="select-all-videos" class="tiny ui right floated button">Select all</button>
+    </div>
+  </div>
+  <div class="ui clearing divider"></div>
+
+  <div class="ui four cards">
+    {% for video in videos %}
+      <div class="card">
+        <div class="image">
+          <img src="{{ video.snippet.thumbnails.high.url }}">
+        </div>
+        <div class="content">
+          <div class="header">{{ video.snippet.title }}</div>
+          <div class="meta">Uploaded on {{ video.snippet.publishedAt|datetime }}</div>
+          <div class="description">{{ video.snippet.description|truncate(90) }}</div>
+        </div>
+        <div class="tiny ui bottom attached toggle button">
+          Select
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="ui dimmer">
+    <div class="ui indeterminate text loader">Syncing your youtube videos to our platform...</div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $('#select-all-videos').click(function() {
+      var button = $(this);
+      if (button.text() == 'Select all') {
+        var mode = 'activate';
+        button.text('Deselect all');
+      } else {
+        var mode = 'deactivate';
+        button.text('Select all');
+      }
+      $('.ui.toggle.button').state(mode, {
+        text: {
+          active: '<i class="icon checkmark"></i> Selected',
+          inactive: 'Select'
+        }
+      });
+    });
+
+    $('#sync-selected-videos').click(function() {
+      $('.ui.dimmer').addClass('active');
+    });
+  </script>
+{% endblock %}
