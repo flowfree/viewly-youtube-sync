@@ -1,15 +1,21 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import uuid
 import json
+import os
+import sys
 
+import httplib2
+from apiclient import discovery
+from oauth2client import client
 from flask import (
     Flask, request, session, url_for, redirect, jsonify,
 )
-from apiclient import discovery
-from oauth2client import client
-import httplib2
 
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CLIENT_SECRETS_JSON = os.path.join(BASE_DIR, 'client_secrets.json')
 
 app = Flask(__name__)
 
@@ -64,7 +70,9 @@ def revoke():
 
 
 if __name__ == "__main__":
-    import uuid
+    if not os.path.isfile(CLIENT_SECRETS_JSON):
+        print('Please obtain the Youtube API client ID and secret.')
+        sys.exit()
     app.secret_key = str(uuid.uuid4())
     app.debug = True
     app.run(port=3000)
